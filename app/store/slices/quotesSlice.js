@@ -1,4 +1,16 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+
+export const fetchQuotes = createAsyncThunk(
+  'quotes/fetchQuotes',
+  async () => {
+    const response = await fetch('https://dummyjson.com/quotes');
+    if (!response.ok) {
+      throw new Error('Failed to fetch quotes');
+    }
+    const data = await response.json();
+    return data.quotes;
+  }
+);
 
 const initialState = {
   quotes: [],
@@ -9,26 +21,22 @@ const initialState = {
 const quotesSlice = createSlice({
   name: 'quotes',
   initialState,
-  reducers: {
-    fetchQuotesRequest: (state) => {
-      state.loading = true;
-      state.error = null;
-    },
-    fetchQuotesSuccess: (state, action) => {
-      state.loading = false;
-      state.quotes = action.payload;
-    },
-    fetchQuotesFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    }
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchQuotes.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchQuotes.fulfilled, (state, action) => {
+        state.loading = false;
+        state.quotes = action.payload;
+      })
+      .addCase(fetchQuotes.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
   }
 });
-
-export const {
-  fetchQuotesRequest,
-  fetchQuotesSuccess,
-  fetchQuotesFailure
-} = quotesSlice.actions;
 
 export default quotesSlice.reducer;

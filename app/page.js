@@ -2,31 +2,14 @@
 
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  fetchQuotesRequest,
-  fetchQuotesSuccess,
-  fetchQuotesFailure
-} from './store/slices/quotesSlice'
+import { fetchQuotes } from './store/slices/quotesSlice';
 
 export default function Home() {
   const dispatch = useDispatch();
   const { quotes, loading, error } = useSelector((state) => state.quotes);
 
   useEffect(() => {
-    const getQuotes = async () => {
-      try {
-        dispatch(fetchQuotesRequest());
-
-        const response = await fetch('https://dummyjson.com/quotes');
-        const data = await response.json();
-
-        dispatch(fetchQuotesSuccess(data.quotes));
-      } catch (error) {
-        dispatch(fetchQuotesFailure(error.message));
-      }
-    };
-
-    getQuotes();
+    dispatch(fetchQuotes());
   }, [dispatch]);
 
   return (
@@ -50,16 +33,16 @@ export default function Home() {
       <div className="w-full max-w-2xl space-y-6">
         {quotes.map((quote) => (
           <div
-          key={quote.id}
-          className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
+            key={quote.id}
+            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
           >
-          <p className="text-gray-200 text-lg italic leading-relaxed mb-4">
-            “{quote.quote}”
-          </p>
+            <p className="text-gray-200 text-lg italic leading-relaxed mb-4">
+              “{quote.quote}”
+            </p>
 
-          <p className="text-right text-sm font-semibold text-gray-400">
-            — {quote.author}
-          </p>
+            <p className="text-right text-sm font-semibold text-gray-400">
+              — {quote.author}
+            </p>
           </div>
         ))}
       </div>
